@@ -20,14 +20,16 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             dcc.Dropdown(
-                id='crossfilter-xaxis-column',
+                id='crossfilter-index',
                 options=[{'label': i, 'value': i} for i in available_indexes],
                 value='IXIC'
             )
         ],
-        style={'display': 'inline-block'}),
-
+        style={'padding':'12px 16px'}),
     ],
+
+
+
     style={'padding': '10px 5px'}),
 
     html.Div(dcc.Slider(
@@ -41,18 +43,112 @@ app.layout = html.Div([
 
     html.Div([
         dcc.Graph(
-            id='crossfilter-indicator-scatter',
+            id='crossfilter-open',
             hoverData={'points': [{'customdata': 'xyz'}]}
         )
-    ], style={'display': 'inline-block', 'padding': '0 20'}),
+    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+
+    html.Div([
+        dcc.Graph(
+            id='crossfilter-high',
+            hoverData={'points': [{'customdata': 'xyz'}]}
+        )
+    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+
+    html.Div([
+        dcc.Graph(
+            id='crossfilter-low',
+            hoverData={'points': [{'customdata': 'xyz'}]}
+        )
+    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+
+    html.Div([
+        dcc.Graph(
+            id='crossfilter-close',
+            hoverData={'points': [{'customdata': 'xyz'}]}
+        )
+    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+
+    html.Div([
+        dcc.Graph(
+            id='crossfilter-adjclose',
+            hoverData={'points': [{'customdata': 'xyz'}]}
+        )
+    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+
+    html.Div([
+        dcc.Graph(
+            id='crossfilter-volume',
+            hoverData={'points': [{'customdata': 'xyz'}]}
+        )
+    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+
 ])
 
 
 @app.callback(
-    dash.dependencies.Output('crossfilter-indicator-scatter', 'figure'),
-    [dash.dependencies.Input('crossfilter-xaxis-column', 'value')])
-def update_graph(xaxis_column_name):
+    dash.dependencies.Output('crossfilter-open', 'figure'),
+    [dash.dependencies.Input('crossfilter-index', 'value'),
+    dash.dependencies.Input('crossfilter-year--slider', 'value')])
+def update_graph(xaxis_column_name, year_value):
     dff = df[df['Index'] == xaxis_column_name]
+    dff = dff[dff['Date'].dt.year <= year_value]
+    fig = px.scatter(dff, x='Date', y="Open")
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
+    return fig
+
+@app.callback(
+    dash.dependencies.Output('crossfilter-high', 'figure'),
+    [dash.dependencies.Input('crossfilter-index', 'value'),
+    dash.dependencies.Input('crossfilter-year--slider', 'value')])
+def update_graph(xaxis_column_name, year_value):
+    dff = df[df['Index'] == xaxis_column_name]
+    dff = dff[dff['Date'].dt.year <= year_value]
+    fig = px.scatter(dff, x='Date', y="High")
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
+    return fig
+
+@app.callback(
+    dash.dependencies.Output('crossfilter-low', 'figure'),
+    [dash.dependencies.Input('crossfilter-index', 'value'),
+    dash.dependencies.Input('crossfilter-year--slider', 'value')])
+def update_graph(xaxis_column_name, year_value):
+    dff = df[df['Index'] == xaxis_column_name]
+    dff = dff[dff['Date'].dt.year <= year_value]
+    fig = px.scatter(dff, x='Date', y="Low")
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
+    return fig
+
+@app.callback(
+    dash.dependencies.Output('crossfilter-close', 'figure'),
+    [dash.dependencies.Input('crossfilter-index', 'value'),
+    dash.dependencies.Input('crossfilter-year--slider', 'value')])
+def update_graph(xaxis_column_name, year_value):
+    dff = df[df['Index'] == xaxis_column_name]
+    dff = dff[dff['Date'].dt.year <= year_value]
+    fig = px.scatter(dff, x='Date', y="Close")
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
+    return fig
+
+
+@app.callback(
+    dash.dependencies.Output('crossfilter-adjclose', 'figure'),
+    [dash.dependencies.Input('crossfilter-index', 'value'),
+    dash.dependencies.Input('crossfilter-year--slider', 'value')])
+def update_graph(xaxis_column_name, year_value):
+    dff = df[df['Index'] == xaxis_column_name]
+    dff = dff[dff['Date'].dt.year <= year_value]
+    fig = px.scatter(dff, x='Date', y="Adj Close")
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
+    return fig
+
+@app.callback(
+    dash.dependencies.Output('crossfilter-volume', 'figure'),
+    [dash.dependencies.Input('crossfilter-index', 'value'),
+    dash.dependencies.Input('crossfilter-year--slider', 'value')])
+def update_graph(xaxis_column_name, year_value):
+    dff = df[df['Index'] == xaxis_column_name]
+    dff = dff[dff['Date'].dt.year <= year_value]
     fig = px.scatter(dff, x='Date', y="Volume")
     fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
     return fig
